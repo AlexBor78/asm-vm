@@ -1,8 +1,13 @@
-# What is that
-
+# Short about the project
+## What is that
 Week-long project, to prove the point.
 No fancy design, KISS as main principle.
 Code is definitely full of small bugs, there is no good testing.
+
+## Motivation "Why?"
+i have to work with emu8086 (old bullshit dos specific asm),
+and i got so mad, so i made it as a prove of asm can be a lot better
+
 
 # About the Architecture
  ## pipeline
