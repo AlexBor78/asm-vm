@@ -2,6 +2,8 @@ CC = clang++ -Wall
 CPPFLAGS = -Wall -Werror -std=c++23
 LDFLAGS = 
 
+NAME=avm
+
 #CPPFLAGS = -Wall -std=c++23 -g -O1 -fsanitize=address -fno-omit-frame-pointer
 #LDFLAGS = -fsanitize=address
 
@@ -12,7 +14,7 @@ obj:
 	mkdir -p $@
 
 main: obj/main.o obj/lexer.o obj/utils.o obj/parser.o obj/vm.o
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o $(NAME) $^
 
 main.cpp: lexer.h
 obj/main.o: main.cpp | obj

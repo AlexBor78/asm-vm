@@ -13,10 +13,10 @@ bool trace{false};
 void print_help(const char* base) {
 	std::cerr
 	<< "Usage: " << base << " [OPTIONS]... SOURCE...\n"
-	<< "Compile the sources and executes them (JIT)\n"
+	<< "Compile the sources and executes them\n"
 	<< std::endl // new line and flush
-	<< "Flags list:\n"
-	<< "-h,\t--help:\n"
+	<< "Options:\n"
+	<< "-h,\t--help\n"
 	<< "\t\tdisplay this help and exit\n"
 	<< "\t--verbose\n"
 	<< "\t\texplain what is being done\n"
