@@ -20,6 +20,14 @@ namespace asm_vm {
 			bool ab{false};
 		} flags{};
 
+
+		inline bool expected_op() const {
+			return !stack.empty();
+		}
+		inline bool expected_two_ops() const {
+			return stack.size() >= 2;
+		}
+
 		void init_vm(const Program&);
 		void cursor_set(uint64_t);
 		void op();

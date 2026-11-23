@@ -122,64 +122,71 @@ namespace asm_vm {
 		stack_push(mem_get(arg)); op();
 	}
 
+
+	inline static void throw_not_enough_ops_for(const std::string& name) {
+		throw std::runtime_error(std::format(
+			"not enough operands for '{}' in stack", name
+		));
+	}
+
 	void ASM_VM::inst_pop_mem(uint64_t arg) {
-		if(stack.empty()) throw std::runtime_error("pop: stack is empty, cannot pop");
+		if(!expected_op()) throw_not_enough_ops_for("pop");
 		mem_set(arg, stack_pop()); op();
 	}
 
 	void ASM_VM::inst_pop() {
-		if(stack.empty()) throw std::runtime_error("pop: stack is empty, cannot pop");
+		if(!expected_op()) throw_not_enough_ops_for("pop");
 		stack_pop(); op();
 	}
 
 	void ASM_VM::inst_add() {
-		if(stack.size() < 2) throw std::runtime_error("add: not enough operands in stack");
+		if(!expected_two_ops()) throw_not_enough_ops_for("add");
 		stack_push(stack_pop() + stack_pop()); op();
 	}
 	void ASM_VM::inst_sub() {
-		if(stack.size() < 2) throw std::runtime_error("sub: not enough operands in stack");
+		if(!expected_two_ops()) throw_not_enough_ops_for("sub");
 		stack_push(stack_pop() - stack_pop()); op();
 	}
 	void ASM_VM::inst_mul() {
-		if(stack.size() < 2) throw std::runtime_error("mul: not enough operands in stack");
+		if(!expected_two_ops()) throw_not_enough_ops_for("mul");
 		stack_push(stack_pop() * stack_pop()); op();
 	}
 	void ASM_VM::inst_div() {
-		if(stack.size() < 2) throw std::runtime_error("div: not enough operands in stack");
 		uint64_t v1 = stack_pop();
 		uint64_t v2 = stack_pop();
 		if(v2 == 0) throw std::runtime_error("Error: division by 0");
 		stack_push(v1 / v2); op();
 	}
 	void ASM_VM::inst_not() {
-		if(stack.size() < 1) throw std::runtime_error("not: not enough operands in stack");
+		if(!expected_op()) throw_not_enough_ops_for("not");
 		stack_push(~stack_pop()); op();
 	}
 	void ASM_VM::inst_and() {
-		if(stack.size() < 2) throw std::runtime_error("and: not enough operands in stack");
+		if(!expected_two_ops()) throw_not_enough_ops_for("and");
 		stack_push(stack_pop() & stack_pop()); op();
 	}
 	void ASM_VM::inst_xor() {
-		if(stack.size() < 2) throw std::runtime_error("xor: not enough operands in stack");
+		if(!expected_two_ops()) throw_not_enough_ops_for("xor");
 		stack_push(stack_pop() ^ stack_pop()); op();
 	}
 	void ASM_VM::inst_or() {
-		if(stack.size() < 2) throw std::runtime_error("or: not enough operands in stack");
+		if(!expected_two_ops()) throw_not_enough_ops_for("or");
 		stack_push(stack_pop() | stack_pop()); op();
 	}
 
 	void ASM_VM::inst_inc_stk() {
-		if(stack.empty()) throw std::runtime_error("inc: stack is empty, cannot inc");
+		if(!expected_op()) throw_not_enough_ops_for("inc");
 		stack_push(stack_pop() + 1); op();
 	}
 	void ASM_VM::inst_inc_mem(uint64_t arg) {
 		mem_set(arg, mem_get(arg) + 1); op();
 	}
+	// deprecated, will be removed in next commit
 	void ASM_VM::inst_lea(uint64_t arg) {
 		stack_push(mem_get(arg)); op();
 	}
 	void ASM_VM::inst_cmp() {
-		if(stack.size() < 2) throw std::runtime_error("cmp: not enough operands in stack");
+		if(!expected_two_ops()) throw_not_enough_ops_for("cmp");
 		uint64_t v1 = stack_pop();
 		uint64_t v2 = stack_pop();
 
@@ -237,12 +244,12 @@ namespace asm_vm {
 	}
 
 	void ASM_VM::inst_putc() {
-		if(stack.empty()) throw std::runtime_error("putc: stack is empty");
+		if(!expected_op()) throw_not_enough_ops_for("putc");
 		std::print("{}", static_cast<char>(static_cast<uint8_t>(stack_pop())) );
 		op();
 	}
 	void ASM_VM::inst_prints() {
-		if(stack.empty()) throw std::runtime_error("prints: stack is empty");
+		if(!expected_op()) throw_not_enough_ops_for("prints");
 		throw std::runtime_error("prints: temporaly insupported");
 		op();
 	}
