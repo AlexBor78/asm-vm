@@ -5,8 +5,9 @@
 
 #include <print>
 #include <fstream>
+#include <iostream>
 
-int main() {
+int main() { try {
 	std::ifstream file("code.asm");
 	std::string code{
 	 std::istreambuf_iterator<char>(file)
@@ -31,4 +32,10 @@ int main() {
 	std::println("\nExecuting...");
 	asm_vm::ASM_VM vm;
 	vm.execute(prog);
+
+	} catch(const std::exception& e) {
+		// using std::pritln for that is ugly
+		std::cerr << "\n\nERROR: "
+			<< e.what() << std::endl;
+	}
 }

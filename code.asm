@@ -24,7 +24,7 @@ xor
 __print_stack
 
 output:
-jmp end_
+;jmp end_
 push 48h
 putc
 
