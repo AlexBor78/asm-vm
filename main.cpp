@@ -8,6 +8,7 @@
 #include <iostream>
 
 bool verbose{false};
+bool trace{false};
 
 void print_help(const char* base) {
 	std::cerr
@@ -19,18 +20,16 @@ void print_help(const char* base) {
 	<< "\t\tdisplay this help and exit\n"
 	<< "\t--verbose\n"
 	<< "\t\texplain what is being done\n"
+	<< "\t--trace\n"
+	<< "\t\tsimilar to --verbose, but a lot more detailed - almost to every call\n"
 	<< std::flush;
 }
 
 int process_file(const std::string& file_path) { try {
 	if(verbose) std::println("\nProcessing {}...", file_path);
 
-	// readding whole file
+	// opening the file
 	std::ifstream file(file_path);
-	std::string code{
-	 std::istreambuf_iterator<char>(file)
-	, std::istreambuf_iterator<char>()
-	};
 
 	if(!file) {
 		std::cerr << "no such file or directory: '"
@@ -38,30 +37,28 @@ int process_file(const std::string& file_path) { try {
 		return -1;
 	}
 
-
-	/**TODO
-	 * Pass the verbose to lexer, parser so it will follow it on it's debug output
-	 * INSTEAD of using -DDEBUG (or #define in code)
-	 */
+	// readding whole file
+	std::string code{
+	 std::istreambuf_iterator<char>(file)
+	, std::istreambuf_iterator<char>()
+	};
 
 	asm_vm::Tokenizer tok;
-	if(verbose) std::println("Processing...");
+	if(verbose) std::println("Tokenizing...");
 	auto tokens = tok.tokenize(code);
-
- 	if(verbose)	std::println("Printing tokens...");
+ 	if(trace)	std::println("Printing tokens...");
 	if(verbose) asm_vm::print(tokens);
 
-
-	asm_vm::Parser parser;
- 	if(verbose)	std::println("\nProcessing...");
+	asm_vm::Parser parser{trace};
+ 	if(verbose)	std::println("\nParsing...");
 	auto prog = parser.parse(tokens);
 
  	if(verbose)	{
-		std::println("Printing program:");
+		if(trace) std::println("Printing program:");
 		asm_vm::print(prog);
 	}
 
- 	std::println("\nExecuting {}...", file_path);
+ 	std::println("\nExecuting '{}'...", file_path);
 	asm_vm::ASM_VM vm;
 	vm.execute(prog);
 
@@ -95,6 +92,12 @@ int main(int argc, char** argv) { try {
 				verbose = true;
 				continue;
 			}
+
+			if(arg == "--trace") {
+				verbose = true;
+				trace = true;
+				continue;
+			}
 			
 			// fine for now
 			if(arg == "-h" || arg == "--help") {
@@ -111,7 +114,7 @@ int main(int argc, char** argv) { try {
 
 	// if --help
 	if(help
-	|| (files.empty() && !verbose)) {
+	|| (files.empty() && !verbose && !trace)) {
 		print_help(argv[0]);
 		return 0;
 	}

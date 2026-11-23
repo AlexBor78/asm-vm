@@ -5,17 +5,10 @@
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
-
-#define DEBUG
-
-#ifdef DEBUG
 #include <print>
-#endif
 
 inline static void debug(const std::string& str) {
-#ifdef DEBUG
 	std::println("{}", str);
-#endif
 }
 
 inline static bool is_that_name_lit(const std::string& str) {
@@ -29,6 +22,7 @@ namespace asm_vm {
 	class Parser {
 	private:
 		std::vector<Token> tokens;
+		bool trace{false};
 		size_t cursor{0};
 		int ops_count{0};
 		Program program{};
@@ -77,7 +71,7 @@ namespace asm_vm {
 		inline void append(kind k, uint64_t a = 0) { append(Instruction{.kind = k,	.arg = a}); }
 
 		inline void add_label(const std::string& name) {
-			debug(std::format("add_label: '{}' {}", name, ops_count ));
+			if(trace) debug(std::format("add_label: '{}' {}", name, ops_count ));
 			program.labels[name] = ops_count;
 		}
 
@@ -98,6 +92,10 @@ namespace asm_vm {
 		}
 
 	public:
+		Parser(bool __trace = false):
+				trace(__trace)
+		{}
+
 		Program parse(std::vector<Token>&);
 	};
 }

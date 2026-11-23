@@ -199,9 +199,9 @@ namespace asm_vm {
 		// memory align by 8
 		sz = program.memory_size + sz;
 		if(sz != 0 && sz % 8 != 0) sz = (sz / 8 + 1) * 8;
-		debug(std::format("meory before: {}", sz));
+		if(trace) debug(std::format("meory before: {}", sz));
 		if(sz != 0 && sz % 8 != 0) sz = (sz / 8 + 1) * 8;
-		debug(std::format("sz after: {}", sz));
+		if(trace) debug(std::format("sz after: {}", sz));
 
 		program.memory_size = sz;
 	}
@@ -316,15 +316,15 @@ namespace asm_vm {
 		));
 	}
 	void Parser::skip_op() {
-		//debug("Skip OP");
+		if(trace) debug("Skip OP");
 
 		if(no_arg_needed(gc().kind)) {
-			//debug(std::format("Just op: {}", stringify(consume().kind)));
+			if(trace) debug(std::format("Just op: {}", stringify(gc().kind)));
 			consume(); ++ops_count; return;
 		}
 
 		if(arg_needed(gc().kind)) {
-			//debug(std::format("Op with arg {}: {}", stringify(gc().kind), gc().lit));
+			if(trace) debug(std::format("Op with arg {}: {}", stringify(gc().kind), gc().lit));
 			consume();
 			if(have_more()) consume();
 			++ops_count; return;
