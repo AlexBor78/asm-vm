@@ -48,8 +48,6 @@ namespace asm_vm {
 			case kind::INC_STK: return "INC_STL";
 			case kind::INC_MEM: return "INC_MEM";
 
-			case kind::LEA: return "LEA";
-
 			case kind::CMP: return "CMP";
 			case kind::JMP: return "JMP";
 

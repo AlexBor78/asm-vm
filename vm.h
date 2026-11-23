@@ -58,8 +58,6 @@ namespace asm_vm {
 		void inst_inc_stk();
 		void inst_inc_mem(uint64_t);
 
-		void inst_lea(uint64_t);
-
 		void inst_cmp();
 		void inst_jmp(uint64_t);
 		void inst_je(uint64_t);

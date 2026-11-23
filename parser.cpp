@@ -271,7 +271,6 @@ namespace asm_vm {
 		switch (k) {
 			default: return false;
 			case kind::PUSH:
-			case kind::LEA:
 			case kind::JMP:
 			case kind::JE:
 			case kind::JNE:
@@ -380,12 +379,6 @@ namespace asm_vm {
 			return;
 		}
 
-		if(gc_cmp(kind::LEA)) { consume(); // consume the op
-			if(have_more() && expected_var()) append(kind::LEA, get_var(consume().lit).offset); 
-			else throw_expected_name(gc().lit);
-			return;
-		}
-	
 		if(no_arg_needed(gc().kind)) {
 			append(consume().kind);
 			return;

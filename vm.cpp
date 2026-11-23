@@ -34,7 +34,6 @@ namespace asm_vm {
 				case kind::INC_STK:	 inst_inc_stk(); break;
 				case kind::INC_MEM:	 inst_inc_mem(inst.arg); break;
 
-				case kind::LEA: 		 inst_lea(inst.arg); break;
 				case kind::CMP: 		 inst_cmp(); break;
 				case kind::JMP: 		 inst_jmp(inst.arg); break;
 
@@ -180,10 +179,6 @@ namespace asm_vm {
 	}
 	void ASM_VM::inst_inc_mem(uint64_t arg) {
 		mem_set(arg, mem_get(arg) + 1); op();
-	}
-	// deprecated, will be removed in next commit
-	void ASM_VM::inst_lea(uint64_t arg) {
-		stack_push(mem_get(arg)); op();
 	}
 	void ASM_VM::inst_cmp() {
 		if(!expected_two_ops()) throw_not_enough_ops_for("cmp");

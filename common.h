@@ -59,8 +59,6 @@ namespace asm_vm {
 	, INC_STK
 	, INC_MEM
 
-	, LEA
-
 	// flow ops
 	, CMP
 	, JMP // jump
@@ -109,7 +107,6 @@ namespace asm_vm {
   , {"or", kind::OR}
 
   , {"inc", kind::INC}
-  , {"lea", kind::LEA}
 
   , {"cmp", kind::CMP}
 
