@@ -15,6 +15,7 @@ namespace asm_vm {
 		void process_lit();
 		void process_word();
 		void process_num();
+		void process_comment();
 
 		inline char gc() const {
 			return source[cursor];

@@ -75,6 +75,11 @@ namespace asm_vm {
 		tokens.emplace_back(Token{.kind = kind::LITERAL, .lit = std::move(num)});
 	}
 
+	void Tokenizer::process_comment() {
+		do consume();
+		while(gc() != '\n');
+	}
+
 	std::vector<Token> Tokenizer::tokenize(std::string& source__) {
 		source = source__;
 		cursor = 0;
@@ -116,6 +121,11 @@ namespace asm_vm {
 
 			if(std::isspace(c)) {
 				consume();
+				continue;
+			}
+
+			if(c == ';') {
+				process_comment();
 				continue;
 			}
 

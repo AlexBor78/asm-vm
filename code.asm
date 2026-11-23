@@ -11,6 +11,8 @@ push var1
 push var2
 __print_stack
 
+; COMMENT
+
 add_:
 add
 __print_stack
