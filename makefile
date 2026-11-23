@@ -1,5 +1,5 @@
 CC = clang++ -Wall
-CPPFLAGS = -Wall -std=c++23
+CPPFLAGS = -Wall -Werror -std=c++23
 LDFLAGS = 
 
 #CPPFLAGS = -Wall -std=c++23 -g -O1 -fsanitize=address -fno-omit-frame-pointer

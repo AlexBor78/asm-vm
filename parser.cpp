@@ -6,8 +6,6 @@
 #include <limits>
 #include <cstring>
 
-#define DEBUG
-
 inline std::unordered_map<std::string, int64_t> var_type_sz {
 	{"db", 1}
 ,	{"dw", 2}
@@ -77,36 +75,45 @@ namespace asm_vm {
 		};
 	}
 
-	LitValue Parser::parse_str_lit(const std::string& str) {
-		if(str == "''" || str == "\"\"") throw std::runtime_error(std::format(
+	inline static void throw_invalid_str_lit(const std::string& str) {
+		throw std::runtime_error(std::format(
 			"Empty string IS Invalid string literal: {}", str
 		));
+	}
+	inline static void throw_unknown_backslash_sequence(char c) {
+		throw std::runtime_error(std::format(
+			"Unknown backslash('\\') sequence: '\\{}'", c
+		));
+	}
 
+	LitValue Parser::parse_str_lit(const std::string& str) {
+		if(str == "''" || str == "\"\"") throw_invalid_str_lit(str);
 		std::string res;
 		for(size_t i = 1; i < str.size(); ++i) { // danger to use unsigned i
 			char c = str[i];
 			if(c == '\\') {
 				c = str[++i]; // consuming backslash
 				switch (c) {
+					default: throw_unknown_backslash_sequence(c);
 					case('\\'): res += '\\'; break;
 					case('\''): res += '\''; break;
 					case('n'): res += '\n'; break;
 					case('t'): res += '\t'; break;
 					case('b'): res += '\b'; break;
 					case('"'): res += '"'; break;
-					default: throw std::runtime_error(
-						std::format("Unknown backslash('\\') sequence: '\\{}'", c)
-					); 
 				} ++i; // consuming the backslashed char
 			} else res += c;
 		} return make_litval(res);
 	}
 
+	inline static void throw_unknown_num_size(uint64_t num) {
+		throw std::runtime_error(std::format(
+		 "Unknown num size: {}", num
+		));
+	}
 	inline static bool wrong_num_sz(uint64_t num, uint sz) {
 		switch(sz) {
-			default: throw std::runtime_error(std::format(
-			 "Unknown num size: {}", num
-			));
+			default: throw_unknown_num_size(num);
 
 			case 1: return num < std::numeric_limits<uint8_t>::min() 
 									|| num > std::numeric_limits<uint8_t>::max();
@@ -122,6 +129,11 @@ namespace asm_vm {
 		}
 	}
 
+	inline static void throw_too_big_init_val(uint sz, const std::string& str) {
+		throw std::runtime_error(std::format(
+			"Too big initial value for {} bytes var: {}", sz, str
+		));
+	}
 	LitValue Parser::parse_num_lit(const std::string& str, uint sz) {
 		int base = 10;
 		switch (str.back()) {
@@ -135,18 +147,16 @@ namespace asm_vm {
 				str.substr(0, base == 10 ? str.size() : str.size() -1)
 			, nullptr // wharever is that
 			, base
-			); if(wrong_num_sz(value, sz)) throw std::runtime_error(std::format (
-					"Too big initial value for {} bytes var: {}", sz, str
-			)); return make_litval(std::bit_cast<uint64_t>(value), sz);
+			); if(wrong_num_sz(value, sz)) throw_too_big_init_val(sz, str);
+			return make_litval(std::bit_cast<uint64_t>(value), sz);
 		} else {
 			uint64_t value = std::stoull(
 			 // without base postfix
 				str.substr(0, base == 10 ? str.size() : str.size() -1)
 			, nullptr // wharever is that
 			, base
-			); if(wrong_num_sz(value, sz)) throw std::runtime_error(std::format (
-					"Too big initial value for {} bytes var: {}", sz, str
-			)); return make_litval(value, sz);
+			); if(wrong_num_sz(value, sz)) throw_too_big_init_val(sz, str);
+			return make_litval(value, sz);
 		}
 	}
 
@@ -196,6 +206,21 @@ namespace asm_vm {
 		program.memory_size = sz;
 	}
 
+	inline static void throw_var_redefinition(const std::string& name) {
+		throw std::runtime_error(std::format(
+			"Variable '{}' redifinition", name
+		));
+	}
+	inline static void throw_label_redefinition(const std::string& name) {
+		throw std::runtime_error(std::format(
+			"Label '{}' redifinition", name
+		));
+	}
+	inline static void throw_literal_too_large(const std::string& name) {
+		throw std::runtime_error(std::format(
+			"literal too large for var '{}'", name
+		));
+	}
 	void Parser::parse_name() {
 		std::string name = consume().lit; // consuming the name
 		consume(); // skipping the colon
@@ -204,26 +229,20 @@ namespace asm_vm {
 		if(is_type(gc().kind)) {
 			auto sz = get_var_type_sz(gc().lit);
 			consume(); // skipping var type
-			if(pass == PassN::FIRST && contain_var(name)) throw std::runtime_error(std::format(
-			  "Variable '{}' redifinition", name
-			));
+			if(pass == PassN::FIRST && contain_var(name)) throw_var_redefinition(name);
 			if(gc_cmp(kind::QMARK)) { 
 				consume(); // skipping the ?
 				if(pass == PassN::FIRST) add_var(name, sz);
 			} else {
 				auto lit = parse_lit(sz);
-				if(!lit.is_ptr() && sz < lit.plain_data_sz)
-					throw std::runtime_error(std::format(
-					"literal too large for var '{}'", name
-				)); if(pass == PassN::FIRST) add_var(name, sz, std::move(lit));
+				if(!lit.is_ptr() && sz < lit.plain_data_sz) throw_literal_too_large(name);
+				if(pass == PassN::FIRST) add_var(name, sz, std::move(lit));
 			}
 		}
 
 		// if just a label
 		else if(pass == PassN::SECOND) {
-			if(contain_label(name)) throw std::runtime_error(std::format(
-						"Label '{}' redifinition", name
-			));
+			if(contain_label(name)) throw_label_redefinition(name);
 			add_label(name);
 		}
 	}
@@ -287,6 +306,11 @@ namespace asm_vm {
 		}
 	}
 
+	inline static void throw_unknown_op(const Token& tok) {
+		throw std::runtime_error(std::format(
+			"Unknown op kind: {}, lit: '{}'", stringify(tok.kind), tok.lit
+		));
+	}
 	void Parser::skip_op() {
 		//debug("Skip OP");
 
@@ -307,11 +331,25 @@ namespace asm_vm {
 			++ops_count; return;
 		}
 
-		throw std::runtime_error(std::format(
-			"Unknown op kind: {}, lit: '{}'", stringify(gc().kind), gc().lit
-		));
+		throw_unknown_op(gc());
 	}
 
+	inline static void throw_expected_ptr_lit_push() {
+		throw std::runtime_error("Expected not ptr literal for PUSH;\nif using '', use HEX");
+	}
+	inline static void throw_push_expected_var_lit() {
+		throw std::runtime_error("After PUSH: Expected var or literal");
+	}
+	inline static void throw_expected_name(const std::string& op) {
+		throw std::runtime_error(std::format(
+			"Expected name for {}", op
+		));
+	}
+	inline static void throw_undeclared_label(const std::string& label) {
+		throw std::runtime_error(std::format(
+			"Undeclared label: '{}'", label
+		));
+	}
 	void Parser::parse_op() {
 		if(gc_cmp(kind::PUSH)) { consume(); // skipping the op
 			if(expected_var()) {
@@ -320,10 +358,10 @@ namespace asm_vm {
 			}	
 			if(expected_lit()) {
 				auto lit = parse_lit();
-				if(lit.is_ptr()) throw std::runtime_error("Expected not ptr literal for PUSH;\nif using '', use HEX");
+				if(lit.is_ptr()) throw_expected_ptr_lit_push();
 				append(kind::PUSH_LIT, lit.plain_data_64);
 				return;
-			} throw std::runtime_error("After PUSH: Expected var or literal");
+			} throw_push_expected_var_lit();
 		}
 
 		if(gc_cmp(kind::POP)) { consume(); // skipping the op
@@ -340,7 +378,7 @@ namespace asm_vm {
 
 		if(gc_cmp(kind::LEA)) { consume(); // consume the op
 			if(have_more() && expected_var()) append(kind::LEA, get_var(consume().lit).offset); 
-			else throw std::runtime_error("Expected name for LEA");
+			else throw_expected_name(gc().lit);
 			return;
 		}
 	
@@ -351,19 +389,13 @@ namespace asm_vm {
 
 		if(only_label_needed(gc().kind)) {
 			auto op = consume(); // consume the op
-			if(!gc_cmp(kind::WORD)) throw std::runtime_error(std::format(
-				"Expected label name for {}", op.lit
-			));
-			if(!contain_label()) throw std::runtime_error(std::format(
-				"Undeclared label: '{}'", gc().lit
-			));
+			if(!gc_cmp(kind::WORD)) throw_expected_name(gc().lit);
+			if(!contain_label()) throw_undeclared_label(gc().lit);
 			append(op.kind, get_label());
 			consume(); return; // consuming the label & returning
 		}
 
-		throw std::runtime_error(std::format(
-			"Unknown op kind: {}, lit: '{}'", stringify(gc().kind), gc().lit
-		));
+		throw_unknown_op(gc());
 	}
 
 	Program Parser::parse(std::vector<Token>& tokens__) {
