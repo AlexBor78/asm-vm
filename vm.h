@@ -42,6 +42,11 @@ namespace asm_vm {
 		void inst_mul();
 		void inst_div();
 
+		void inst_not();
+		void inst_and();
+		void inst_xor();
+		void inst_or();
+
 		void inst_inc_stk();
 		void inst_inc_mem(uint64_t);
 

@@ -42,10 +42,18 @@ namespace asm_vm {
 	, POP
 	, POP_MEM
 
+	// arithmetics 
 	, ADD
 	, SUB
 	, MUL
 	, DIV
+	
+	// logical ops
+	, NOT
+	, AND
+	, XOR
+	, OR
+
 
 	, INC
 	, INC_STK
@@ -94,6 +102,11 @@ namespace asm_vm {
   , {"sub", kind::SUB}
   , {"mul", kind::MUL}
   , {"div", kind::DIV}
+
+  , {"not", kind::NOT}
+  , {"and", kind::AND}
+  , {"xor", kind::XOR}
+  , {"or", kind::OR}
 
   , {"inc", kind::INC}
   , {"lea", kind::LEA}

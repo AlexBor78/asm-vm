@@ -38,6 +38,12 @@ namespace asm_vm {
 			case kind::SUB: return "SUB";
 			case kind::MUL: return "MUL";
 			case kind::DIV: return "DIV";
+
+			case kind::NOT: return "NOT";
+			case kind::AND: return "AND";
+			case kind::XOR: return "XOR";
+			case kind::OR: return "OR";
+
 			case kind::INC: return "INC";
 			case kind::INC_STK: return "INC_STL";
 			case kind::INC_MEM: return "INC_MEM";

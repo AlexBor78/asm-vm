@@ -26,6 +26,11 @@ namespace asm_vm {
 				case kind::MUL: 		 inst_mul(); break;
 				case kind::DIV: 		 inst_div(); break;
 
+				case kind::NOT: 		 inst_not(); break;
+				case kind::AND: 		 inst_and(); break;
+				case kind::XOR: 		 inst_xor(); break;
+				case kind::OR: 		 	 inst_or(); break;
+
 				case kind::INC_STK:	 inst_inc_stk(); break;
 				case kind::INC_MEM:	 inst_inc_mem(inst.arg); break;
 
@@ -146,6 +151,25 @@ namespace asm_vm {
 		if(v2 == 0) throw std::runtime_error("Error: division by 0");
 		stack_push(v1 + v2); op();
 	}
+	void ASM_VM::inst_not() {
+		if(stack.size() < 1) throw std::runtime_error("not: not enough operands in stack");
+		stack_push(~stack_pop()); op();
+	}
+	void ASM_VM::inst_and() {
+		if(stack.size() < 2) throw std::runtime_error("and: not enough operands in stack");
+		stack_push(stack_pop() & stack_pop()); op();
+	}
+	void ASM_VM::inst_xor() {
+		if(stack.size() < 2) throw std::runtime_error("xor: not enough operands in stack");
+		stack_push(stack_pop() ^ stack_pop()); op();
+	}
+	void ASM_VM::inst_or() {
+		if(stack.size() < 2) throw std::runtime_error("or: not enough operands in stack");
+		stack_push(stack_pop() | stack_pop()); op();
+	}
+
+
+
 	void ASM_VM::inst_inc_stk() {
 		if(stack.empty()) throw std::runtime_error("inc: stack is empty, cannot inc");
 		stack_push(stack_pop() + 1); op();

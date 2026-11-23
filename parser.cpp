@@ -254,6 +254,10 @@ namespace asm_vm {
 			case kind::SUB:
 			case kind::MUL:
 			case kind::DIV:
+			case kind::NOT:
+			case kind::AND:
+			case kind::XOR:
+			case kind::OR:
 			case kind::CMP:
 			case kind::PUTC:
 			case kind::PRINTS:

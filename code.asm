@@ -16,9 +16,11 @@ __print_stack
 add_:
 add
 __print_stack
-pop
-push ff00h
-inc
+not
+__print_stack
+push FF00FF00FF00FFh
+__print_stack
+xor
 __print_stack
 
 output:
