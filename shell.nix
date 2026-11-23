@@ -2,8 +2,9 @@
 
 pkgs.mkShell.override { stdenv = pkgs.llvmPackages.libcxxStdenv; } {
   packages = with pkgs; [
+		gnumake
     clang
-    cmake
+		bear
   ];
 
   # With libcxxStdenv, this line is often still helpful
