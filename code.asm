@@ -14,7 +14,7 @@ __print_stack
 ; COMMENT
 
 add_:
-add
+mod
 __print_stack
 not
 __print_stack

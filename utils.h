@@ -38,6 +38,7 @@ namespace asm_vm {
 			case kind::SUB: return "SUB";
 			case kind::MUL: return "MUL";
 			case kind::DIV: return "DIV";
+			case kind::MOD: return "MOD";
 
 			case kind::NOT: return "NOT";
 			case kind::AND: return "AND";

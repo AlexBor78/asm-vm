@@ -254,6 +254,7 @@ namespace asm_vm {
 			case kind::SUB:
 			case kind::MUL:
 			case kind::DIV:
+			case kind::MOD:
 			case kind::NOT:
 			case kind::AND:
 			case kind::XOR:

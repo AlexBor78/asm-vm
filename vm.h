@@ -49,6 +49,7 @@ namespace asm_vm {
 		void inst_sub();
 		void inst_mul();
 		void inst_div();
+		void inst_mod();
 
 		void inst_not();
 		void inst_and();

@@ -25,6 +25,7 @@ namespace asm_vm {
 				case kind::SUB: 		 inst_sub(); break;
 				case kind::MUL: 		 inst_mul(); break;
 				case kind::DIV: 		 inst_div(); break;
+				case kind::MOD: 		 inst_mod(); break;
 
 				case kind::NOT: 		 inst_not(); break;
 				case kind::AND: 		 inst_and(); break;
@@ -150,11 +151,23 @@ namespace asm_vm {
 		if(!expected_two_ops()) throw_not_enough_ops_for("mul");
 		stack_push(stack_pop() * stack_pop()); op();
 	}
+
+	inline static void throw_division_by_zero() {
+		throw std::runtime_error("Error: division by 0");
+	}
 	void ASM_VM::inst_div() {
+		if(!expected_two_ops()) throw_not_enough_ops_for("div");
 		uint64_t v1 = stack_pop();
 		uint64_t v2 = stack_pop();
-		if(v2 == 0) throw std::runtime_error("Error: division by 0");
+		if(v2 == 0) throw_division_by_zero();
 		stack_push(v1 / v2); op();
+	}
+	void ASM_VM::inst_mod() {
+		if(!expected_two_ops()) throw_not_enough_ops_for("mod");
+		uint64_t v1 = stack_pop();
+		uint64_t v2 = stack_pop();
+		if(v2 == 0) throw_division_by_zero();
+		stack_push(v1 % v2); op();
 	}
 	void ASM_VM::inst_not() {
 		if(!expected_op()) throw_not_enough_ops_for("not");

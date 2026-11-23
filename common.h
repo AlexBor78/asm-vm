@@ -47,6 +47,7 @@ namespace asm_vm {
 	, SUB
 	, MUL
 	, DIV
+	, MOD 
 	
 	// logical ops
 	, NOT
@@ -100,6 +101,7 @@ namespace asm_vm {
   , {"sub", kind::SUB}
   , {"mul", kind::MUL}
   , {"div", kind::DIV}
+  , {"mod", kind::MOD}
 
   , {"not", kind::NOT}
   , {"and", kind::AND}
