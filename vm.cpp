@@ -149,7 +149,7 @@ namespace asm_vm {
 		uint64_t v1 = stack_pop();
 		uint64_t v2 = stack_pop();
 		if(v2 == 0) throw std::runtime_error("Error: division by 0");
-		stack_push(v1 + v2); op();
+		stack_push(v1 / v2); op();
 	}
 	void ASM_VM::inst_not() {
 		if(stack.size() < 1) throw std::runtime_error("not: not enough operands in stack");
@@ -168,8 +168,6 @@ namespace asm_vm {
 		stack_push(stack_pop() | stack_pop()); op();
 	}
 
-
-
 	void ASM_VM::inst_inc_stk() {
 		if(stack.empty()) throw std::runtime_error("inc: stack is empty, cannot inc");
 		stack_push(stack_pop() + 1); op();
@@ -186,8 +184,8 @@ namespace asm_vm {
 		uint64_t v2 = stack_pop();
 
 		flags.eq = v1 == v2;
-		flags.gt = v1 > v2;
-		flags.ab = std::bit_cast<int64_t>(v1) > std::bit_cast<int64_t>(v2);
+		flags.ab = v1 > v2;
+		flags.gt = std::bit_cast<int64_t>(v1) > std::bit_cast<int64_t>(v2);
 
 		stack_push(v2);
 		stack_push(v1);
@@ -199,33 +197,43 @@ namespace asm_vm {
 	}
 	void ASM_VM::inst_je(uint64_t arg) {
 		if(flags.eq) cursor_set(arg);
+		else op();
 	}
 	void ASM_VM::inst_jne(uint64_t arg) {
 		if(!flags.eq) cursor_set(arg);
+		else op();
 	}
 	void ASM_VM::inst_jl(uint64_t arg) {
 		if(!flags.gt) cursor_set(arg);
+		else op();
 	}
 	void ASM_VM::inst_jle(uint64_t arg) {
 		if(!flags.gt || flags.eq) cursor_set(arg);
+		else op();
 	}
 	void ASM_VM::inst_jg(uint64_t arg) {
 		if(flags.gt) cursor_set(arg);
+		else op();
 	}
 	void ASM_VM::inst_jge(uint64_t arg) {
 		if(flags.gt || flags.eq) cursor_set(arg);
+		else op();
 	}
 	void ASM_VM::inst_jb(uint64_t arg) {
 		if(!flags.ab) cursor_set(arg);
+		else op();
 	}
 	void ASM_VM::inst_jbe(uint64_t arg) {
 		if(!flags.ab || flags.eq) cursor_set(arg);
+		else op();
 	}
 	void ASM_VM::inst_ja(uint64_t arg) {
 		if(flags.ab) cursor_set(arg);
+		else op();
 	}
 	void ASM_VM::inst_jae(uint64_t arg) {
 		if(flags.ab || flags.eq) cursor_set(arg);
+		else op();
 	}
 
 	void ASM_VM::inst_putc() {
