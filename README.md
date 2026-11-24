@@ -39,3 +39,8 @@ vars does not depends on anything to parse;
 labels depends on ops_count
 ops depends on vars to parse (a little bit ambiguity)
 
+### Project weaknesses
+1. Memory management. I used smart pointers, but better to use some custom allocs.
+2. No multi-threading. I could process files in each thread.
+3. No functions supports in language.
+
